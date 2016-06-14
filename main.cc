@@ -12,8 +12,8 @@ using namespace std;
 void
 bulletin_board_init(BulletinBoard & bb, const string & user_data_file, const string & message_data_file)
 {
-	// load users from file
-	if (!bb.loadUsers(user_data_file))
+    // load users from file
+    if (!bb.loadUsers(user_data_file))
 	{
 		cerr << "Unable to load users from " << user_data_file << endl;
 		exit(EXIT_FAILURE);
