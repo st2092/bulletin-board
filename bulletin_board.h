@@ -18,7 +18,7 @@ using namespace std;
  class BulletinBoard {
    private:
     string bulletin_board_title;
-    User current_user;
+    User* current_user;
     vector<User> list_of_users;
     vector<Message*> list_of_messages;
     
@@ -26,7 +26,7 @@ using namespace std;
     void addUser(const string & name, const string & pw);
     bool userExists(const string & name, const string & pw) const;  // ensure function cannot modify member variables
     User getUser(const string & name) const;
-    void display() const;
+    void displayAllMessages() const;
     void addTopic();
     void addReply();
     
@@ -40,5 +40,6 @@ using namespace std;
     void login();
     void logout();
     void run();
+    bool perform_action(const char & action);
  };
 #endif

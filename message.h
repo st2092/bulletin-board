@@ -19,14 +19,14 @@ class Message
     unsigned id;
     vector<Message*> child_list;
     
-  private:
+  public:
     Message();
     Message(const string & author, const string & subject, const string & body, unsigned id);
     virtual void print() const = 0;   // must be defined by every derived class
     virtual bool isReply() const = 0; // must be defined by every derived class
     string getSubject() const;
     unsigned getId() const;
-    virtual string ToFormattedString() const = 0; // must be defined by every derived class
+    virtual string toFormattedString() const = 0; // must be defined by every derived class
     virtual ~Message();
     void addChild(Message* child);
 };

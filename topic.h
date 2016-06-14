@@ -1,4 +1,4 @@
-#ifndefine TOPIC_H
+#ifndef TOPIC_H
 #define TOPIC_H
 #include <iostream>
 #include <sstream>
@@ -16,7 +16,7 @@ class Topic: public Message {
   
   public:
     Topic();
-    Topic(const string & author, const string & subject, const string & body, unsigned id);
+    Topic(const string & author, const string & subject, const string & body, unsigned int id);
     virtual void print() const;
     virtual bool isReply() const;
     virtual string toFormattedString() const;

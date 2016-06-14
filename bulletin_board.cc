@@ -4,6 +4,7 @@ using namespace std;
 unsigned message_count = 0;
 
 /*
+ * function: addUser
  * This method adds the user into the list of user.
  * Users that are in the list of user are registered
  * user of the bulletin board.
@@ -15,14 +16,14 @@ BulletinBoard::addUser( const string & username, const string & pw )
 }
  
 /*
+ * function: userExists
  * This method returns true if the user exist.
  */
 bool
-BulletinBoard::userExists( const string & username, const string & pw )
+BulletinBoard::userExists( const string & username, const string & pw ) const
 {
   for(unsigned i = 0; i < list_of_users.size(); i++)
   {
-    // check if user exists
     if ( list_of_users[i].check(username, pw) )
     {
       return true;
@@ -33,6 +34,7 @@ BulletinBoard::userExists( const string & username, const string & pw )
 }
   
 /*
+ * function: loadUsers
  * This method loads in a list of users from a file.
  * The format of the user file is the following:
  *    < username >
@@ -44,12 +46,14 @@ BulletinBoard::loadUsers( const string & filename )
   ifstream input (filename.c_str());
   string username;
   string pw;
+  int user_count = 0;
+
   if (input)
   {
     while (!input.eof())
     {
       input >> username;
-      if (input.eof())
+      if (input.eof() && user_count > 0)
       {
         return false;  // file format is incorrect (password for username should follow)
       }
@@ -71,31 +75,33 @@ BulletinBoard::loadUsers( const string & filename )
 }
    
 /*
+ * function: getUser
  * This method gets the user from the list of users that matches
  * the username passed in.
  * Returns the default user if not found.
  */
 User
-BulletinBoard::getUser( const string & username )
+BulletinBoard::getUser( const string & username ) const
 {
   for (unsigned i = 0; i < list_of_users.size(); i++)
   {
-    if (list_of_users.getUsername() == username)
+    if (list_of_users[i].getUsername() == username)
     {
       return list_of_users[i];
     }
   }
  
-  User not_found();
+  User not_found;
   return not_found;
 }
    
 /*
+ * function: displayAllMessages
  * This method displays messages currently on the 
  * bulletin board.
  */
 void
-BulletinBoard::display() const
+BulletinBoard::displayAllMessages() const
 {
   string seperator (150, '=');
   cout << "\n" << seperator << "\n";
@@ -110,6 +116,7 @@ BulletinBoard::display() const
 }
     
 /*
+ * function: loadMessages
  * This method loads in a file containing all the messages
  * into the bulletin board when it exited last time.
  */
@@ -120,15 +127,15 @@ BulletinBoard::loadMessages( const string & filename )
   if (input)
   {
     // do nothing for now
+    return true;
   }
-  else
-  {
-    // input file stream is invalid
-    return false;
-  }
+ 
+  // input file stream is invalid
+  return false;
 }
      
 /*
+ * function: addTopic
  * This method adds a new topic to the bulletin board.
  */ 
 void
@@ -137,9 +144,8 @@ BulletinBoard::addTopic()
   string subject;
   string body;
   stringstream stringstream_subject;
-  stringstrea stringstream_body;
+  stringstream stringstream_body;
   
-  // get subject and message from user
   cout << "Subject: ";
   getline(cin, subject);
   stringstream_subject << subject;
@@ -158,8 +164,7 @@ BulletinBoard::addTopic()
     }
   }
   
-  // create message and add to list
-  Message* msg_ptr = new Topic(current_user.getUsername(),    // username
+  Message* msg_ptr = new Topic(current_user->getUsername(),    // username
                                stringstream_subject.str(),    // subject
                                stringstream_body.str(),       // message
                                list_of_messages.size() + 1);  // post number or id
@@ -169,6 +174,7 @@ BulletinBoard::addTopic()
 }
       
 /*
+ * function: addReply
  * This method adds a reply to a Topic.
  */
 void
@@ -179,6 +185,7 @@ BulletinBoard::addReply()
     // there are no topics in bulletin board yet
     return;
   }
+
   cout << "\nEnter Topic ID ( '-1' for Menu): ";
   int topic_id;
   cin >> topic_id;
@@ -189,7 +196,7 @@ BulletinBoard::addReply()
   }
   else
   {
-    while (topic_id > list_of_messages.size())
+    while ((unsigned int)topic_id > list_of_messages.size())
     {
       // topic id is invalid
       cout << "Invalid topic id!" << endl;
@@ -220,11 +227,11 @@ BulletinBoard::addReply()
     }
    
     // add reply to topic post
-    Message* msg_ptr = new Reply(current_user.getUser,
+    Message* msg_ptr = new Reply(current_user->getUsername(),
                                 "Re: " + list_of_messages[topic_id - 1]->getSubject(),
                                 "\t" + stringstream_body.str(),
                                 message_count + 1);
-    list_of_messages.push_back(msg_prt);
+    list_of_messages.push_back(msg_ptr);
     message_count++;
     list_of_messages[topic_id - 1]->addChild(msg_ptr);
     cout << "Post added!" << endl;
@@ -237,7 +244,10 @@ BulletinBoard::addReply()
  */
 BulletinBoard::BulletinBoard()
 :bulletin_board_title("Fairy Tail Bulletin Board")
-{}
+{
+  current_user = NULL;
+}
+
 
 /*
  * Constructor for the bulletin board class.
@@ -246,7 +256,9 @@ BulletinBoard::BulletinBoard()
  */
 BulletinBoard::BulletinBoard(const string & board_title)
 :bulletin_board_title(board_title)
-{}
+{
+  current_user = NULL;
+}
 
 /*
  * This method is the destructor of the bulletin board class.
@@ -254,13 +266,14 @@ BulletinBoard::BulletinBoard(const string & board_title)
  */
 BulletinBoard::~BulletinBoard()
 {
-  for (unsigned i = 0; i < list_of_messages.size(); i++)
+  for (unsigned int i = 0; i < list_of_messages.size(); i++)
   {
-    delete *(list_of_messages[i]);
+    delete list_of_messages[i];
   }
 }
 
 /*
+ * function: login
  * This method allows the user to login to the bulletin board.
  * A user can only make a post if they are logged in.
  */
@@ -293,20 +306,21 @@ BulletinBoard::login()
   
   // logged in successfully
   current_user = new User(username, pw);
-  cout << "Welcome " << current_user.getUsername() << "!" << endl;
+  cout << "Welcome " << current_user->getUsername() << "!" << endl;
 }
 
 /*
+ * function: logout
  * This method allows the user to log off.
  */
 void
 BulletinBoard::logout()
 {
-  delete current_user;
-  current_user = new User();
+  current_user = NULL;
 }
 
 /*
+ * function: display_menu
  * This method displays the menu of available action.
  */
  void
@@ -325,14 +339,15 @@ BulletinBoard::logout()
  }
 
 /*
+ * function: perform_action
  * This method runs the method to perform the action issued by
  * the user.
  * Returns true to indicate keep running; false for quitting
  */
 bool
-perform_action(const char & action)
+BulletinBoard::perform_action(const char & action)
 {
-  swtich (action)
+  switch (action)
   {
     case 'D': case 'd': // display messages
       if (list_of_messages.size() <= 0)
@@ -341,7 +356,7 @@ perform_action(const char & action)
       }
       else
       {
-        display();
+        displayAllMessages();
       }
       return true;
       break;
@@ -373,44 +388,48 @@ perform_action(const char & action)
 }
  
 /*
+ * function: run
  * This method runs the bulletin board and interacts with the
  * user through the menu. 
  */
 void
 BulletinBoard::run()
 {
-  char action;
+  string action;
+  char action_chosen;
   bool keep_running = true;
   while (keep_running)
   {
     display_menu();
     cout << "Enter action to perform: ";
     cin >> action;
-    if (action == 'Q' || action == 'q')
+    if (action == "Q" || action == "q")
     {
       break;
     }
-    if (!current_user.userExists() && (action != 'L' || action != 'l'))  
+    if (!current_user && (action != "L" || action != "l"))  
     {
       // user not logged in yet
-      while (action != 'L' || action != 'l')
+      while (action != "L" && action != "l")
       {
         cout << "Action is invalid, please log in first." << endl;
         cout << "Enter action to perform: ";
         cin >> action;
       }
     }
-    if (current_user.userExists() && (action == 'L' || action == 'l'))
+    if (current_user && (action == "L" || action == "l"))
     {
       // user is logged in and wants to login again
-      while (action == 'L' || action == 'l')
+      while (action == "L" || action == "l")
       {
-        cout << "Action is invalid, please log in first." << endl;
+        cout << "Action is invalid, please log out first to login with another account." << endl;
         cout << "Enter action to perform: ";
         cin >> action;
       }
     }
-    keep_running = perform_action(action);
+
+    action_chosen = action[0];
+    keep_running = perform_action(action_chosen);
   }
   
   // user wants to quit
@@ -418,6 +437,7 @@ BulletinBoard::run()
 }
 
 /*
+ * function: saveMessages
  * This method save messages to a data file for backup.
  */
 bool

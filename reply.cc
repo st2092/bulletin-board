@@ -12,7 +12,7 @@ Reply::Reply()
  * Constructor with parameters. 
  */
  Reply::Reply(const string & author, const string & subject, const string & body, unsigned id)
- :Mesage(author, "Re: " + subject, body, id)
+ :Message(author, "Re: " + subject, body, id)
  {}
  
 /*
@@ -35,9 +35,12 @@ Reply::print() const
  * e.g. indentation = 2 then reply should be indented 4 spaces
  */
 void
-Reply::print_subtree(int indentation)
+Reply::printSubtree(int indentation) const
 {
   // not yet implemented
+  for (int i = 0; i < indentation; i++)
+  {
+  }
 }
 
 /*

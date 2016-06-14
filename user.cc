@@ -34,14 +34,14 @@ User::getUsername() const
  *       is a valid User object, we should still return false 
  */
 bool
-User::check(const string & username, const string & pw)
+User::check(const string & username, const string & pw) const
 {
-  if (username == "" | pw == "")
+  if (username == "" || pw == "")
   {
     // default username and password
     return false;
   }
-  else if (this.username == username && this.pw == pw)
+  else if (this->username == username && this->pw == pw)
   {
     return true;
   }

@@ -11,7 +11,7 @@ Topic::Topic()
 /*
  * Constructor with parameters. 
  */
-Topic:Topic(const string & author, const string & subject, const string & body, unsigned id)
+Topic::Topic(const string & author, const string & subject, const string & body, unsigned int id)
 :Message(author, subject, body, id)
 {}
 
@@ -20,7 +20,7 @@ Topic:Topic(const string & author, const string & subject, const string & body, 
  * In this case, it is always false since this is a topic.
  */
 bool
-Topic::isReply()
+Topic::isReply() const
 {
   return false;
 }
@@ -49,16 +49,16 @@ Topic::toFormattedString() const
   if (child_list.size() > 0)
   {
     stringstream child_str;
-    child_str << child_list[0]->get_id();
+    child_str << child_list[0]->getId();
     for (unsigned i = 1; i < child_list.size(); i++)
     {
       //child_str << child_list[i]->get_id() << " ";
-      child_str << " " << child_list[i]->get_id();
+      child_str << " " << child_list[i]->getId();
     }
-    formatted_str << "\n:children: " << child.str(); 
+    formatted_str << "\n:children: " << child_str.str(); 
   }
   
-  formatted_str << "\n:body:" << body << "<end>\n"
+  formatted_str << "\n:body:" << body << "<end>\n";
   return formatted_str.str();
 }
 
@@ -76,6 +76,6 @@ Topic::print() const
        
   for (unsigned i = 0; i < child_list.size(); i++)
   {
-    dynamic_cast<Reply*>(child_list[i])->print_subtree(1);
+    dynamic_cast<Reply*>(child_list[i])->printSubtree(1);
   }
 }
